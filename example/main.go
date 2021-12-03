@@ -52,7 +52,7 @@ func main() {
 		log.Fatalf("Error verifying token %v", err)
 	}
 	if vtoken.Valid {
-		log.Println("     verified with TPM PublicKey")
+		log.Println("     verified with YK PublicKey")
 	}
 
 	// verify with provided RSAPublic key

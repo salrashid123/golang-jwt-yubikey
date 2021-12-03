@@ -1,7 +1,7 @@
 
 # golang-jwt for Yubikey
 
-Another extension for [go-jwt](https://github.com/golang-jwt/jwt#extensions) that allows creating and verifying JWT tokens where the private key is embedded inside a I[PIV-enabled Yubikey](https://developers.yubico.com/PIV/Introduction/YubiKey_and_PIV.html).
+Another extension for [go-jwt](https://github.com/golang-jwt/jwt#extensions) that allows creating and verifying JWT tokens where the private key is embedded inside  [PIV-enabled Yubikey](https://developers.yubico.com/PIV/Introduction/YubiKey_and_PIV.html).
 
 for reference, see 
 

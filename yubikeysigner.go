@@ -150,6 +150,11 @@ func (s *SigningMethodYK) Sign(signingString string, key interface{}) (string, e
 	}
 	defer yk.Close()
 
+	// serialNumber, err := yk.Serial()
+	// if err != nil {
+	// 	return "", fmt.Errorf("unable to read yk serial number %v", err)
+	// }
+	// fmt.Printf("Serial Number: %s\n", strconv.FormatUint(uint64(serialNumber), 10))
 	cert, err := yk.Certificate(piv.SlotSignature)
 	if err != nil {
 		return "", fmt.Errorf("unable to load certificate not found %v", err)
@@ -162,7 +167,7 @@ func (s *SigningMethodYK) Sign(signingString string, key interface{}) (string, e
 	}
 
 	message := []byte(signingString)
-	hasher := sha256.New()
+	hasher := s.Hash().New()
 	_, err = hasher.Write(message)
 	if err != nil {
 		return "", fmt.Errorf("error hashing YubiKey: %v", err)
