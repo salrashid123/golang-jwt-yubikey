@@ -4,9 +4,7 @@ import (
 	"context"
 	"crypto"
 	"crypto/rand"
-	"crypto/sha256"
 	"encoding/base64"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"strings"
@@ -71,14 +69,6 @@ func NewYKContext(parent context.Context, val *YKConfig) (context.Context, error
 		return nil, fmt.Errorf("unable to load certificate not found %v", err)
 	}
 	val.publicKeyFromYK = cert.PublicKey
-
-	message := []byte(cert.Raw)
-	hasher := sha256.New()
-	hasher.Write(message)
-
-	kid := hex.EncodeToString(hasher.Sum(nil))
-
-	val.KeyID = kid
 
 	return context.WithValue(parent, ykConfigKey{}, val), nil
 }

@@ -26,7 +26,8 @@ func main() {
 	token := jwt.NewWithClaims(yk.SigningMethodYKRS256, claims)
 
 	config := &yk.YKConfig{
-		Pin: "123456",
+		KeyID: "abcdefg",
+		Pin:   "123456",
 	}
 
 	keyctx, err := yk.NewYKContext(ctx, config)
@@ -34,7 +35,9 @@ func main() {
 		log.Fatalf("Unable to initialize tpmJWT: %v", err)
 	}
 
-	token.Header["kid"] = config.GetKeyID()
+	if config.GetKeyID() != "" {
+		token.Header["kid"] = config.GetKeyID()
+	}
 	tokenString, err := token.SignedString(keyctx)
 	if err != nil {
 		log.Fatalf("Error signing %v", err)

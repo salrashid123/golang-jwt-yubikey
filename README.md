@@ -37,10 +37,10 @@ Once you have that,  create a test JWT and verify it with an RSA key that is ext
 
 ```log
 # cd examples/
-# $ go run main.go 
-TOKEN: eyJhbGciOiJSUzI1NiIsImtpZCI6ImRjNGVhNjM4YzMyNGNkMjU5YmIyMGVhNDJhNWU0NTI5YWFjYzExZDdmNjgzNWJmNjBjYjUzM2I5YmE3YTJkNTEiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjE2Mzg0OTM5MDQsImlzcyI6InRlc3QifQ.A185fR58_RypFeZ_PE2xSqX3AxxoDsHy2jfIl37LFoHriFZ1rmqteoEgLXwetxBFSSAlwyOvl8d4h_kIKBQP6uCGpCI_RhTjx4M6wy13KmH_whg3lE_ZJdl6BUR_utPWT_ri0ByPZiuHh0wk9G6QTqLKeuYGebgAj_BxWtGvlK0ZvOm0NpviJYu_yz-f2k25QJVbLM_WdnkjM2LmcfDXXAVt7f20nRDyaXXUfaw5m8-_-xZCKuu5IwUxPd6inQOg9wQlDFiWbxSb4IUzbcmXyBobJNeV2TIXolj8qswAU0wlBC_uBdgd46wCMn64ngdOUALO0FdOmgMH0SIAd69kSQ
-2021/12/02 20:10:44      verified with TPM PublicKey
-2021/12/02 20:10:44      verified with exported PubicKey
+# go run main.go 
+TOKEN: eyJhbGciOiJSUzI1NiIsImtpZCI6ImFiY2RlZmciLCJ0eXAiOiJKV1QifQ.eyJleHAiOjE2OTMxMzUxMDEsImlzcyI6InRlc3QifQ.m2piHlp09fSbSR3nN0ca2JXu6TmnfDu-WCe9ZwpLlPb9dmKRmThSsbTRD7HL3mhGpez1fImWMCjnOtiIqxNxPe37HyuDnqUKJ3ei2EIGX0bNFzt95fnkNIIWr_4ug09CimmZaQ5P2Bp97-_ghIHVAXmTEtPnhtu8DappFo95mTP4asUhItYTI3elFjVpBzr9eoVr_7-JoI8BLMPIuhdwz3mx0bIjdQ63pYl6QgWq87-PpiTxvycstafLFla0n-uhF3qSjunUSG9N-jjgBmUPS7DL_mB5vygQ0OGxjDIfoNRxBv9nSUqS3LJO9L49be03t--UcSOhY51bTA-Xo7kgew
+2023/08/27 07:17:21      verified with YK PublicKey
+2023/08/27 07:17:21      verified with exported PubicKey
 
 ```
 
@@ -49,18 +49,16 @@ The JWT is formatted as:
 ```json
 {
   "alg": "RS256",
-  "kid": "dc4ea638c324cd259bb20ea42a5e4529aacc11d7f6835bf60cb533b9ba7a2d51",
+  "kid": "abcdefg",
   "typ": "JWT"
 }
 {
-  "exp": 1638493904,
+  "exp": 1693135101,
   "iss": "test"
 }
 ```
 
-Note the keyID: `dc4ea638c324cd259bb20ea42a5e4529aacc11d7f6835bf60cb533b9ba7a2d51`...thats actually the fingerprint of the certificate bound to the private key used to sign.
-
-to use, just import the library (`"github.com/salrashid123/golang-jwt-yubikey"`) configure the Yubikey wiht the pin.  Remember to set the override so that the correct `alg` is defined in the JWT header
+to use, just import the library (`"github.com/salrashid123/golang-jwt-yubikey"`) configure the Yubikey with the pin.  Remember to set the override so that the correct `alg` is defined in the JWT header
 
 ```golang
 package main
