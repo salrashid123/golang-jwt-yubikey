@@ -4,12 +4,11 @@ import (
 	"context"
 	"crypto"
 	"crypto/rand"
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"strings"
 
-	jwt "github.com/golang-jwt/jwt"
+	jwt "github.com/golang-jwt/jwt/v5"
 
 	"github.com/go-piv/piv-go/piv"
 )
@@ -108,35 +107,35 @@ func (s *SigningMethodYK) Hash() crypto.Hash {
 	return s.hasher
 }
 
-func (s *SigningMethodYK) Sign(signingString string, key interface{}) (string, error) {
+func (s *SigningMethodYK) Sign(signingString string, key interface{}) ([]byte, error) {
 	var ctx context.Context
 
 	switch k := key.(type) {
 	case context.Context:
 		ctx = k
 	default:
-		return "", jwt.ErrInvalidKey
+		return nil, jwt.ErrInvalidKey
 	}
 	config, ok := YKFromContext(ctx)
 	if !ok {
-		return "", errMissingConfig
+		return nil, errMissingConfig
 	}
 
 	cards, err := piv.Cards()
 	if err != nil {
-		return "", fmt.Errorf("unable to open yubikey %v", err)
+		return nil, fmt.Errorf("unable to open yubikey %v", err)
 	}
 	var yk *piv.YubiKey
 	for _, card := range cards {
 		if strings.Contains(strings.ToLower(card), "yubikey") {
 			if yk, err = piv.Open(card); err != nil {
-				return "", fmt.Errorf("could not find yubikey:  %v", err)
+				return nil, fmt.Errorf("could not find yubikey:  %v", err)
 			}
 			break
 		}
 	}
 	if yk == nil {
-		return "", fmt.Errorf("yubikey not found Please make sure the key is inserted %v", err)
+		return nil, fmt.Errorf("yubikey not found Please make sure the key is inserted %v", err)
 	}
 	defer yk.Close()
 
@@ -147,20 +146,20 @@ func (s *SigningMethodYK) Sign(signingString string, key interface{}) (string, e
 	// fmt.Printf("Serial Number: %s\n", strconv.FormatUint(uint64(serialNumber), 10))
 	cert, err := yk.Certificate(piv.SlotSignature)
 	if err != nil {
-		return "", fmt.Errorf("unable to load certificate not found %v", err)
+		return nil, fmt.Errorf("unable to load certificate not found %v", err)
 	}
 
 	auth := piv.KeyAuth{PIN: config.Pin} //piv.DefaultPIN
 	priv, err := yk.PrivateKey(piv.SlotSignature, cert.PublicKey, auth)
 	if err != nil {
-		return "", fmt.Errorf("unable to load privateKey %v", err)
+		return nil, fmt.Errorf("unable to load privateKey %v", err)
 	}
 
 	message := []byte(signingString)
 	hasher := s.Hash().New()
 	_, err = hasher.Write(message)
 	if err != nil {
-		return "", fmt.Errorf("error hashing YubiKey: %v", err)
+		return nil, fmt.Errorf("error hashing YubiKey: %v", err)
 	}
 
 	hashed := hasher.Sum(message[:0])
@@ -169,15 +168,15 @@ func (s *SigningMethodYK) Sign(signingString string, key interface{}) (string, e
 
 	signer, ok := priv.(crypto.Signer)
 	if !ok {
-		return "", fmt.Errorf("expected private key to implement crypto.Signer")
+		return nil, fmt.Errorf("expected private key to implement crypto.Signer")
 	}
 
 	signedBytes, err := signer.Sign(rng, hashed, crypto.SHA256)
 	if err != nil {
-		return "", fmt.Errorf(" error from signing from YubiKey: %v", err)
+		return nil, fmt.Errorf(" error from signing from YubiKey: %v", err)
 	}
 
-	return base64.RawURLEncoding.EncodeToString(signedBytes), nil
+	return signedBytes, nil
 }
 
 func YKVerfiyKeyfunc(ctx context.Context, config *YKConfig) (jwt.Keyfunc, error) {
@@ -186,6 +185,6 @@ func YKVerfiyKeyfunc(ctx context.Context, config *YKConfig) (jwt.Keyfunc, error)
 	}, nil
 }
 
-func (s *SigningMethodYK) Verify(signingString, signature string, key interface{}) error {
+func (s *SigningMethodYK) Verify(signingString string, signature []byte, key interface{}) error {
 	return s.override.Verify(signingString, signature, key)
 }

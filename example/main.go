@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	yk "github.com/salrashid123/golang-jwt-yubikey"
 )
 
@@ -17,8 +17,8 @@ func main() {
 	ctx := context.Background()
 
 	var keyctx interface{}
-	claims := &jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(time.Minute * 1).Unix(),
+	claims := &jwt.RegisteredClaims{
+		ExpiresAt: &jwt.NumericDate{time.Now().Add(time.Minute * 1)},
 		Issuer:    "test",
 	}
 
